@@ -267,7 +267,7 @@
     // Targets at different distances with improved graphics
     const targets = [];
     // Bullseye target: use a flat cylinder with bullseye texture
-    const targetGeometry = new THREE.CylinderGeometry(1, 1, 0.15, 64);
+    const targetGeometry = new THREE.CylinderGeometry(1.2, 1.2, 0.4, 64);
 
     // Bullseye texture using canvas
     function createBullseyeTexture() {
@@ -910,7 +910,7 @@
     }
 
     // Timer for 70m target shooting
-    const enemyShotInterval = 2.5; // seconds
+    const enemyShotInterval = 4.5; // seconds (increased from 2.5)
 
     // Animation loop
     let time = 0;
