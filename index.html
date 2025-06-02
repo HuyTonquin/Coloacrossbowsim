@@ -213,7 +213,7 @@
     const groundTexture = textureLoader.load('https://threejs.org/examples/textures/terrain/grasslight-big.jpg');
     groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
     groundTexture.repeat.set(10, 15);
-    const groundGeometry = new THREE.PlaneGeometry(90, 90, 88, 88);
+    const groundGeometry = new THREE.PlaneGeometry(85, 85, 88, 88);
     const groundMaterial = new THREE.MeshLambertMaterial({ map: groundTexture });
     const ground = new THREE.Mesh(groundGeometry, groundMaterial);
     ground.rotation.x = -Math.PI / 2; // Correct rotation for ground
@@ -267,7 +267,7 @@
     // Targets at different distances with improved graphics
     const targets = [];
     // Bullseye target: use a flat cylinder with bullseye texture
-    const targetGeometry = new THREE.CylinderGeometry(1.2, 1.2, 0.4, 64);
+    const targetGeometry = new THREE.CylinderGeometry(1.5, 1.5, 0.4, 64);
 
     // Bullseye texture using canvas
     function createBullseyeTexture() {
@@ -372,7 +372,7 @@
     // Change stick color to red
     const stickMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000, shininess: 100 });
     const stick = new THREE.Mesh(stickGeometry, stickMaterial);
-    stick.position.set(0, 0.32, 1.3);
+    stick.position.set(-0.06, 0.32, 1.3);
     crossbowGroup.add(stick);
 
     // Limbs (bow arms, more like reference image: pronounced outward curve, thicker, slight taper)
@@ -888,8 +888,8 @@
       let targetVec = playerPos.clone();
       if (miss) {
         // Offset aim randomly (miss left/right/up/down)
-        targetVec.x += (Math.random() - 0.5) * 4;
-        targetVec.y += (Math.random() - 0.5) * 2;
+        targetVec.x += (Math.random() - 0.5) * 6;
+        targetVec.y += (Math.random() - 0.5) * 6;
       }
 
       // Calculate direction and lobbing
@@ -961,7 +961,7 @@
             // Use per-target timer
             if (!target.lastEnemyShotTime) target.lastEnemyShotTime = 0;
             const now = performance.now() / 1000;
-            let falseRatio = score < 150 ? 0.1 : 0.05;
+            let falseRatio = score < 150 ? 0.2 : 0.1;
             if (now - target.lastEnemyShotTime > enemyShotInterval) {
               spawnEnemyArrow(target.mesh, falseRatio);
               target.lastEnemyShotTime = now;
