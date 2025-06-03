@@ -724,6 +724,11 @@
           scene.remove(arrow);
           arrow = null;
         }
+        // Remove all enemy arrows
+        if (enemyArrows && enemyArrows.length) {
+          enemyArrows.forEach(ea => scene.remove(ea));
+          enemyArrows.length = 0;
+        }
         // Reset score and UI
         score = 0;
         scoreDisplay.textContent = score;
@@ -733,7 +738,7 @@
         updateAccuracy();
         // Reset player health
         playerHealth = 100;
-        updateHealth(); // <-- ensure health bar and label update
+        updateHealth();
         // Show health bar container if hidden
         document.getElementById('healthBarContainer').style.display = 'block';
         // Remove game over message if present
@@ -745,10 +750,25 @@
         targetsShouldMove = false;
         // Reset game over flag
         gameOver = false;
-        // Respawn targets
-        distances.forEach(() => spawnTarget());
+        // Reset crossbow position and rotation
+        crossbowGroup.position.set(0, 1, 0);
+        crossbowGroup.rotation.set(0, 0, 0);
+        // Reset camera position and rotation
+        camera.position.set(0, 1.5, 2.5);
+        camera.lookAt(0, 1, 0);
+        // Reset aim/crouch mode if present
+        aimMode = false;
+        if (document.getElementById('aimBtn')) document.getElementById('aimBtn').style.display = 'block';
+        if (document.getElementById('backBtn')) document.getElementById('backBtn').style.display = 'none';
+        // Restore stick geometry to original
+        stick.geometry.dispose();
+        stick.geometry = new THREE.CylinderGeometry(0.008, 0.008, 0.45, 32);
+        // Reset falseRatio to initial value (if you use a variable for it)
+        window.falseRatio = undefined; // or set to your initial value if you use a global variable
         // Show loaded arrow
         loadedArrow.visible = true;
+        // Respawn targets
+        distances.forEach(() => spawnTarget());
         // Restart animation loop if needed
         animate();
       });
@@ -863,7 +883,7 @@
     // Store enemy arrows
     const enemyArrows = [];
     // Helper to spawn an enemy arrow from a target towards the player, with lobbing and false ratio
-    function spawnEnemyArrow(targetMesh, falseRatio) {
+    function spawnEnemyArrow(targetMesh, scoreForFalseRatio) {
       const arrowGroup = new THREE.Group();
       const shaft = new THREE.Mesh(
         new THREE.CylinderGeometry(0.05, 0.05, 0.8, 12),
@@ -883,7 +903,11 @@
       // Calculate direction to player camera
       const playerPos = camera.position.clone();
 
-      // False ratio: chance to miss
+      // --- Robust false ratio logic ---
+      // Use score to determine false ratio
+      let falseRatio = scoreForFalseRatio < 150 ? 0.3 : 0.2;
+
+      // Determine if this shot should miss
       let miss = Math.random() < falseRatio;
       let targetVec = playerPos.clone();
       if (miss) {
@@ -961,9 +985,8 @@
             // Use per-target timer
             if (!target.lastEnemyShotTime) target.lastEnemyShotTime = 0;
             const now = performance.now() / 1000;
-            let falseRatio = score < 150 ? 0.2 : 0.1;
             if (now - target.lastEnemyShotTime > enemyShotInterval) {
-              spawnEnemyArrow(target.mesh, falseRatio);
+              spawnEnemyArrow(target.mesh, score);
               target.lastEnemyShotTime = now;
             }
           }
