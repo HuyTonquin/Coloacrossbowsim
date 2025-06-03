@@ -267,7 +267,7 @@
     // Targets at different distances with improved graphics
     const targets = [];
     // Bullseye target: use a flat cylinder with bullseye texture
-    const targetGeometry = new THREE.CylinderGeometry(1.5, 1.5, 0.4, 64);
+    const targetGeometry = new THREE.CylinderGeometry(1.5, 1.5, 0.8, 64);
 
     // Bullseye texture using canvas
     function createBullseyeTexture() {
@@ -298,7 +298,7 @@
     }
     const bullseyeTexture = createBullseyeTexture();
     const targetMaterial = new THREE.MeshPhongMaterial({ map: bullseyeTexture, shininess: 30 });
-    const distances = [70, 55, 63];
+    const distances = [70, 50, 60];
 
     // Helper to create a label sprite for a given distance
     function createDistanceLabelSprite(distance) {
@@ -345,14 +345,14 @@
     function spawnTarget() {
       const dist = distances[Math.floor(Math.random() * distances.length)];
       const target = new THREE.Mesh(targetGeometry, targetMaterial.clone());
-      target.position.set(Math.random() * 10 - 5, 1, -dist);
+      target.position.set(Math.random() * 12 - 5, 1, -dist);
       target.rotation.x = Math.PI / 2;
       target.userData.distance = dist; // <-- add this line
       const labelSprite = createDistanceLabelSprite(dist);
       labelSprite.position.set(0, -3, -2);
       target.add(labelSprite);
       scene.add(target);
-      targets.push({ mesh: target, distance: dist, hit: false, scale: 1, label: labelSprite });
+      targets.push({ mesh: target, distance: dist, hit: false, scale: 10, label: labelSprite });
     }
     distances.forEach(() => spawnTarget());
 
@@ -1045,7 +1045,7 @@
         targets.forEach(target => {
           if (!target.hit && arrow) {
             const distance = arrow.position.distanceTo(target.mesh.position);
-            if (distance < 1) {
+            if (distance < 1.2) {
               target.hit = true;
               target.mesh.material.color.set(0x00FF00);
               score += 10;
@@ -1085,7 +1085,7 @@
           eArrow.rotateX(Math.PI / 2);
         }
         // Check collision with player (camera)
-        if (eArrow.position.distanceTo(camera.position) <= 1.1 && !gameOver) {
+        if (eArrow.position.distanceTo(camera.position) <= 0.9 && !gameOver) {
           if (eArrow.userData.is70mArrow) {
             playerHealth -= 4;
             updateHealth();
