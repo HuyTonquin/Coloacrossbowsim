@@ -103,6 +103,22 @@
   </div>
   <!-- Shoot button for mobile/touch -->
   <button id="shootBtn">Shoot</button>
+  <!-- Restart button at bottom center -->
+  <button id="restartBtn" style="
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    font-size: 1.3em;
+    padding: 0.5em 1.2em;
+    border-radius: 0.5em;
+    border: none;
+    background: #e67e22;
+    color: white;
+    opacity: 0.85;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  ">Restart</button>
   <!-- Aim button -->
   <button id="aimBtn" style="
     position: absolute;
@@ -982,6 +998,64 @@
         if (el.id !== 'iframeContainer') el.style.display = 'none';
       });
     }
+
+    // --- Restart Button Logic ---
+    const restartBtn = document.getElementById('restartBtn');
+    restartBtn.addEventListener('click', function () {
+      // Remove all targets
+      targets.forEach(t => scene.remove(t.mesh));
+      targets.length = 0;
+      // Remove flying arrow if present
+      if (arrow) {
+        scene.remove(arrow);
+        arrow = null;
+      }
+      // Remove all enemy arrows
+      if (enemyArrows && enemyArrows.length) {
+        enemyArrows.forEach(ea => scene.remove(ea));
+        enemyArrows.length = 0;
+      }
+      // Reset score and UI
+      score = 0;
+      scoreDisplay.textContent = score;
+      // Reset accuracy
+      arrowsShot = 0;
+      arrowsHit = 0;
+      updateAccuracy();
+      // Reset player health
+      playerHealth = 100;
+      updateHealth();
+      // Show health bar container if hidden
+      document.getElementById('healthBarContainer').style.display = 'block';
+      // Remove game over message if present
+      const infoDiv = document.getElementById('info');
+      const gameOverMsg = infoDiv.querySelector('div');
+      if (gameOverMsg) gameOverMsg.remove();
+      // Reset target speed and movement
+      targetSpeed = 0.05;
+      targetsShouldMove = false;
+      // Reset game over flag
+      gameOver = false;
+      // Reset crossbow position and rotation
+      crossbowGroup.position.set(0, 1, 0);
+      crossbowGroup.rotation.set(0, 0, 0);
+      // Reset camera position and rotation
+      camera.position.set(0, 1.5, 2.5);
+      camera.lookAt(0, 1, 0);
+      // Reset aim/crouch mode if present
+      aimMode = false;
+      if (document.getElementById('aimBtn')) document.getElementById('aimBtn').style.display = 'block';
+      if (document.getElementById('backBtn')) document.getElementById('backBtn').style.display = 'none';
+      // Restore stick geometry to original
+      stick.geometry.dispose();
+      stick.geometry = new THREE.CylinderGeometry(0.008, 0.008, 0.45, 32);
+      // Show loaded arrow
+      loadedArrow.visible = true;
+      // Respawn targets
+      distances.forEach(() => spawnTarget());
+      // Restart animation loop if needed
+      animate();
+    });
   </script>
   <div id="hitFlash"></div>
 </body>
